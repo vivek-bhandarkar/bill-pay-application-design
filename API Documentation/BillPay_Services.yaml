@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: JAVA_TO_DEV_MICROSERVICES
+  title: BILL PAY Services
   version: 1.0.0
 servers:
   - url: http://{{api_gateway_host}}
@@ -10,17 +10,17 @@ components:
       type: http
       scheme: bearer
 tags:
-  - name: BANKING_CORE_MICROSERVICES
-  - name: BANKING_CORE_MICROSERVICES > API_HEALTH
-  - name: BANKING_CORE_MICROSERVICES > BANKING_CORE_SERVICE
-  - name: BANKING_CORE_MICROSERVICES > BANKING_CORE_USER_SERVICE
-  - name: BANKING_CORE_MICROSERVICES > FUND_TRANSFER_SERVICE
-  - name: BANKING_CORE_MICROSERVICES > UTIL_PAYMENTS
+  - name: BILL_PAY_MICROSERVICES
+  - name: BILL_PAY_MICROSERVICES > API_HEALTH
+  - name: BILL_PAY_MICROSERVICES > CUSTOMER_SERVICE
+  - name: BILL_PAY_MICROSERVICES > PAYMENT_SERVICE
+  - name: BILL_PAY_MICROSERVICES > BULK_PAYMENT_SERVICE
+  - name: BILL_PAY_MICROSERVICES > BILLING_SERVICE
 paths:
-  /user/actuator/health:
+  /customer/actuator/health:
     get:
       tags:
-        - BANKING_CORE_MICROSERVICES > API_HEALTH
+        - BILL_PAY_MICROSERVICES > API_HEALTH
       summary: USER_API_HEALTH
       security:
         - bearerAuth: []
@@ -29,69 +29,98 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /fund-transfer/actuator/health:
+  /payment/actuator/health:
     get:
       tags:
-        - BANKING_CORE_MICROSERVICES > API_HEALTH
-      summary: FUND_TRANSFER_API_HEALTH
+        - BILL_PAY_MICROSERVICES > API_HEALTH
+      summary: PAYMENT_API_HEALTH
       responses:
         '200':
           description: Successful response
           content:
             application/json: {}
-  /core/api/v1/transaction/fund-transfer:
+  /bulk_payment/actuator/health:
+    get:
+      tags:
+        - BILL_PAY_MICROSERVICES > API_HEALTH
+      summary: BULK_PAYMENT_API_HEALTH
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: { }
+  /customer/api/v1/customer/:
     post:
       tags:
-        - BANKING_CORE_MICROSERVICES > BANKING_CORE_SERVICE
-      summary: FUND_TRANSFER
+        - BILL_PAY_MICROSERVICES > CUSTOMER_SERVICE
+      summary: Register Customer Details
       requestBody:
         content:
           application/json:
             schema:
               type: object
               example:
-                fromAccount: '100015003001'
-                toAccount: '100015003000'
-                amount: 2000
+                email: 'email@email.com'
+                first_name: 'Vivek'
+                last_name: 'Bhandarkar'
+                dob : '10/03/1984'
+                gender : 'male'
       responses:
-        '200':
-          description: Successful response
+        '201':
+          description: User Registration Successful
           content:
             application/json: {}
-  /core/api/v1/user:
+  /customer/api/v1/customer/{id}:
     get:
       tags:
-        - BANKING_CORE_MICROSERVICES > BANKING_CORE_SERVICE
-      summary: READ_ALL_USERS_BANKING_CORE
+        - BILL_PAY_MICROSERVICES > CUSTOMER_SERVICE
+      summary: Fetch Customer details with {id}
       responses:
         '200':
           description: Successful response
           content:
             application/json: {}
-  /core/api/v1/account/bank-account/100015003000:
+  /payment/api/v1/wallet/{id}:
     get:
       tags:
-        - BANKING_CORE_MICROSERVICES > BANKING_CORE_SERVICE
-      summary: READ_BANK_ACCOUNT_BY_NUMBER
+        - BILL_PAY_MICROSERVICES > PAYMENT_SERVICE
+      summary: READ_WALLET_DETAILS_BY_ID
       responses:
         '200':
           description: Successful response
           content:
             application/json: {}
-  /core/api/v1/account/util-account/HUTCH:
+  /payment/api/v1/wallet/{id}/balance:
     get:
       tags:
-        - BANKING_CORE_MICROSERVICES > BANKING_CORE_SERVICE
-      summary: READ_UTIL_ACCOUNT_BY_PROVIDER_NAME
+        - BILL_PAY_MICROSERVICES > PAYMENT_SERVICE
+      summary: READ_WALLET_BALANCE_BY_ID
       responses:
         '200':
           description: Successful response
           content:
-            application/json: {}
-  /core/api/v1/transaction/util-payment:
+            application/json: { }
+  /payment/api/v1/wallet/{id}/top-up:
     post:
       tags:
-        - BANKING_CORE_MICROSERVICES > BANKING_CORE_SERVICE
+        - BILL_PAY_MICROSERVICES > BILLING_SERVICE
+      summary: TOP_UP WALLET ID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                amount: '100'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /payment/api/v1/fund-transfer:
+    post:
+      tags:
+        - BILL_PAY_MICROSERVICES > PAYMENT_SERVICE
       summary: UTILITY_PAYMENT
       requestBody:
         content:
@@ -99,94 +128,94 @@ paths:
             schema:
               type: object
               example:
-                providerId: 2
-                amount: 250
-                referenceNumber: '0712402547'
-                account: '100015003000'
+                wallet_id: 2
+                biller_account: 250
+                amount: '100'
       responses:
         '200':
           description: Successful response
           content:
             application/json: {}
-  /user/api/v1/bank-user:
+  /bulk_payment/api/v1/fund-transfer:
+    post:
+      tags:
+        - BILL_PAY_MICROSERVICES > BULK_PAYMENT_SERVICE
+      summary: UTILITY_PAYMENT
+      requestBody:
+        content:
+          application/csv:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: { }
+  /bulk_payment/api/v1/fund-transfer/{id}:
     get:
       tags:
-        - BANKING_CORE_MICROSERVICES > BANKING_CORE_USER_SERVICE
-      summary: READ_USER_LIST
+        - BILL_PAY_MICROSERVICES > BULK_PAYMENT_SERVICE
+      summary: BULK_PAYMENT_STATUS_BY_ID
       responses:
         '200':
           description: Successful response
           content:
-            application/json: {}
-  /user/api/v1/bank-user/register:
-    post:
-      tags:
-        - BANKING_CORE_MICROSERVICES > BANKING_CORE_USER_SERVICE
-      summary: CREATE_USER
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                password: '123'
-                email: guru@gmail.com
-                identification: 901830556V
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json: {}
-  /user/api/v1/bank-user/37aa1f5f-2c9f-4e73-a1f1-d7a216851b69555:
+            application/json: { }
+  /billing/api/v1/billtype/:
     get:
       tags:
-        - BANKING_CORE_MICROSERVICES > BANKING_CORE_USER_SERVICE
-      summary: READ_USER_AUTH_ID
+        - BILL_PAY_MICROSERVICES > BILLING_SERVICE
+      summary: GET_ALL_BILL_TYPE
       responses:
         '200':
           description: Successful response
           content:
             application/json: {}
-  /user/api/v1/bank-user/update/25:
-    patch:
+  /billing/api/v1/billtype/{id}:
+    get:
       tags:
-        - BANKING_CORE_MICROSERVICES > BANKING_CORE_USER_SERVICE
-      summary: UPDATE_USER
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                status: APPROVED
+        - BILL_PAY_MICROSERVICES > BILLING_SERVICE
+      summary: GET_ALL_BILL_TYPE_BY_ID
       responses:
         '200':
           description: Successful response
           content:
-            application/json: {}
-  /fund-transfer/api/v1/transfer:
+            application/json: { }
+  /billing/api/v1/billtype/{id}/biller:
+    get:
+      tags:
+        - BILL_PAY_MICROSERVICES > BILLING_SERVICE
+      summary: GET_ALL_BILLER_INFO_BY_BILL_TYPE_ID
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: { }
+  /billing/api/v1/biller/{biller_id}:
+    get:
+      tags:
+        - BILL_PAY_MICROSERVICES > BILLING_SERVICE
+      summary: GET_ALL_BILLER_INFO_BY_BILL_INFO_ID
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: { }
+  /billing/api/v1/biller/{biller_id}/metadata:
+    get:
+      tags:
+        - BILL_PAY_MICROSERVICES > BILLING_SERVICE
+      summary: GET_ALL_BILLER_CUSTOMER_REGISTRATION_METADATA_BY_BILLER_INFO_ID
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: { }
+  /billing/api/v1/register-bill-customer:
     post:
       tags:
-        - BANKING_CORE_MICROSERVICES > FUND_TRANSFER_SERVICE
-      summary: FUND_TRANSFER
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example:
-                fromAccount: '100015003001'
-                toAccount: '100015003000'
-                amount: 1250.34
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json: {}
-  /payment/api/v1/utility-payment:
-    post:
-      tags:
-        - BANKING_CORE_MICROSERVICES > UTIL_PAYMENTS
+        - BILL_PAY_MICROSERVICES > PAYMENT_SERVICE
       summary: UTILITY_PAYMENT
       requestBody:
         content:
@@ -194,10 +223,19 @@ paths:
             schema:
               type: object
               example:
-                providerId: 2
-                amount: 2000
-                referenceNumber: '0712402547'
-                account: '100015003000'
+                customer_id: 2
+                biller_id: 250
+                biller_customer_id: 'XZ100'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /billing/api/v1/biller_customer_registrations/{id}/bill:
+    get:
+      tags:
+        - BILL_PAY_MICROSERVICES > PAYMENT_SERVICE
+      summary: UTILITY_PAYMENT
       responses:
         '200':
           description: Successful response
