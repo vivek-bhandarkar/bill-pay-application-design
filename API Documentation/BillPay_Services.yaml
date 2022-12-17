@@ -1,15 +1,205 @@
-openapi: 3.0.1
+openapi: 3.0.0
 info:
-  title: Sample API
-  description: API description in Markdown.
+  title: JAVA_TO_DEV_MICROSERVICES
   version: 1.0.0
 servers:
-  - url: 'https://api.example.com'
+  - url: http://{{api_gateway_host}}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+tags:
+  - name: BANKING_CORE_MICROSERVICES
+  - name: BANKING_CORE_MICROSERVICES > API_HEALTH
+  - name: BANKING_CORE_MICROSERVICES > BANKING_CORE_SERVICE
+  - name: BANKING_CORE_MICROSERVICES > BANKING_CORE_USER_SERVICE
+  - name: BANKING_CORE_MICROSERVICES > FUND_TRANSFER_SERVICE
+  - name: BANKING_CORE_MICROSERVICES > UTIL_PAYMENTS
 paths:
-  /users:
+  /user/actuator/health:
     get:
-      summary: Returns a list of users.
-      description: Optional extended description in Markdown.
+      tags:
+        - BANKING_CORE_MICROSERVICES > API_HEALTH
+      summary: USER_API_HEALTH
+      security:
+        - bearerAuth: []
       responses:
         '200':
-          description: OK
+          description: Successful response
+          content:
+            application/json: {}
+  /fund-transfer/actuator/health:
+    get:
+      tags:
+        - BANKING_CORE_MICROSERVICES > API_HEALTH
+      summary: FUND_TRANSFER_API_HEALTH
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /core/api/v1/transaction/fund-transfer:
+    post:
+      tags:
+        - BANKING_CORE_MICROSERVICES > BANKING_CORE_SERVICE
+      summary: FUND_TRANSFER
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                fromAccount: '100015003001'
+                toAccount: '100015003000'
+                amount: 2000
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /core/api/v1/user:
+    get:
+      tags:
+        - BANKING_CORE_MICROSERVICES > BANKING_CORE_SERVICE
+      summary: READ_ALL_USERS_BANKING_CORE
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /core/api/v1/account/bank-account/100015003000:
+    get:
+      tags:
+        - BANKING_CORE_MICROSERVICES > BANKING_CORE_SERVICE
+      summary: READ_BANK_ACCOUNT_BY_NUMBER
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /core/api/v1/account/util-account/HUTCH:
+    get:
+      tags:
+        - BANKING_CORE_MICROSERVICES > BANKING_CORE_SERVICE
+      summary: READ_UTIL_ACCOUNT_BY_PROVIDER_NAME
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /core/api/v1/transaction/util-payment:
+    post:
+      tags:
+        - BANKING_CORE_MICROSERVICES > BANKING_CORE_SERVICE
+      summary: UTILITY_PAYMENT
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                providerId: 2
+                amount: 250
+                referenceNumber: '0712402547'
+                account: '100015003000'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /user/api/v1/bank-user:
+    get:
+      tags:
+        - BANKING_CORE_MICROSERVICES > BANKING_CORE_USER_SERVICE
+      summary: READ_USER_LIST
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /user/api/v1/bank-user/register:
+    post:
+      tags:
+        - BANKING_CORE_MICROSERVICES > BANKING_CORE_USER_SERVICE
+      summary: CREATE_USER
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                password: '123'
+                email: guru@gmail.com
+                identification: 901830556V
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /user/api/v1/bank-user/37aa1f5f-2c9f-4e73-a1f1-d7a216851b69555:
+    get:
+      tags:
+        - BANKING_CORE_MICROSERVICES > BANKING_CORE_USER_SERVICE
+      summary: READ_USER_AUTH_ID
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /user/api/v1/bank-user/update/25:
+    patch:
+      tags:
+        - BANKING_CORE_MICROSERVICES > BANKING_CORE_USER_SERVICE
+      summary: UPDATE_USER
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                status: APPROVED
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /fund-transfer/api/v1/transfer:
+    post:
+      tags:
+        - BANKING_CORE_MICROSERVICES > FUND_TRANSFER_SERVICE
+      summary: FUND_TRANSFER
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                fromAccount: '100015003001'
+                toAccount: '100015003000'
+                amount: 1250.34
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /payment/api/v1/utility-payment:
+    post:
+      tags:
+        - BANKING_CORE_MICROSERVICES > UTIL_PAYMENTS
+      summary: UTILITY_PAYMENT
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                providerId: 2
+                amount: 2000
+                referenceNumber: '0712402547'
+                account: '100015003000'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
